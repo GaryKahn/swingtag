@@ -1,0 +1,36 @@
+import Dexie, { type Table } from 'dexie'
+import type { Component, LineSheet, Photo, Settings, Style, Template } from './types'
+
+export class CostsheetDB extends Dexie {
+  settings!: Table<Settings, string>
+  components!: Table<Component, string>
+  templates!: Table<Template, string>
+  styles!: Table<Style, string>
+  photos!: Table<Photo, string>
+  lineSheets!: Table<LineSheet, string>
+
+  constructor(name = 'costsheet') {
+    super(name)
+    this.version(1).stores({
+      settings: 'id',
+      components: 'id, category, name',
+      templates: 'id, name',
+      styles: 'id, styleNumber, updatedAt',
+      photos: 'id, ownerId',
+      lineSheets: 'id, updatedAt',
+    })
+  }
+}
+
+export const db = new CostsheetDB()
+
+export const uid = () =>
+  globalThis.crypto?.randomUUID?.() ?? `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`
+
+let persistRequested = false
+/** Ask the browser not to evict our data under storage pressure (once per session). */
+export function requestPersist() {
+  if (persistRequested) return
+  persistRequested = true
+  navigator.storage?.persist?.().catch(() => {})
+}
