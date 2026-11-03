@@ -35,6 +35,7 @@ const { offlineReady } = useRegisterSW({ immediate: true })
         <span v-if="!online">Offline — everything still works</span>
         <span v-else-if="offlineReady">Ready to use offline</span>
         <span v-else>Saved on this device</span>
+        <RouterLink :to="{ path: '/help', query: { s: 'about' } }" class="mt-1 block hover:text-stone-600">Free &amp; open source · MIT · No warranty</RouterLink>
       </div>
     </aside>
 

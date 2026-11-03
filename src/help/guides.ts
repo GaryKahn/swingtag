@@ -11,6 +11,7 @@ export interface Guide {
   intro?: string
   steps?: string[]
   tips?: string[]
+  links?: { label: string; href: string }[]
   /** An interactive block rendered after the steps. */
   widget?: 'install'
   figures: Figure[]
@@ -180,5 +181,23 @@ export const GUIDES: Guide[] = [
     ],
     tips: ["On iPhone, Safari can clear a website's data after a few weeks without visits. Installing Swingtag to your home screen prevents this. Backups are still a good idea."],
     figures: [{ src: img('backup'), alt: 'Export and import backup buttons', kind: 'card' }],
+  },
+  {
+    id: 'about',
+    title: 'Privacy, disclaimer & licence',
+    summary: 'Where your data lives, checking your figures, and the open-source licence.',
+    intro: 'Swingtag is a free, open-source tool made for independent designers.',
+    steps: [
+      "Privacy: everything you enter (styles, prices, photos, customers and bank details) is saved only on this device. Nothing is sent to a server, there are no accounts, and the makers of Swingtag can't see your data.",
+      "Your responsibility: you are the only one with your data, so if you clear your browser or lose your phone, it's gone unless you exported a backup.",
+      'Check your figures: Swingtag does the maths you give it, but prices, margins, VAT and invoices are your responsibility. Check them before sending anything to a customer, and ask an accountant about tax and VAT registration.',
+      'No warranty: Swingtag is provided "as is", without any warranty, under the MIT licence. The authors are not liable for any loss arising from its use.',
+      'Open source: the code is free to use, copy and change under the MIT licence. You can find it, and report problems, on GitHub.',
+    ],
+    links: [
+      { label: 'Source code & issue tracker', href: 'https://github.com/GaryKahn/swingtag' },
+      { label: 'MIT licence', href: 'https://github.com/GaryKahn/swingtag/blob/main/LICENSE' },
+    ],
+    figures: [],
   },
 ]

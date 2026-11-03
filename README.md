@@ -81,3 +81,11 @@ Participants open the URL once while online. After that it works offline and can
 - Photos are resized to 1600px JPEGs (plus a 400px thumbnail) before they're stored.
 - Safari can evict site data after weeks of no use unless the app is installed to the home screen. The app requests
   persistent storage and shows "last backup" in Settings as a nudge.
+
+## Licence
+
+[MIT](LICENSE) © 2026 Gary Kahn. Free to use, copy and modify.
+
+Swingtag is provided **as is, without warranty**. It does the arithmetic you give it, but prices, margins, VAT and
+invoices are the user's responsibility to check. All data stays on the user's device; nothing is sent to a server.
+

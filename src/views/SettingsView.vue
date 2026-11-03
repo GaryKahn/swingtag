@@ -269,7 +269,7 @@ async function eraseAll() {
         <label><span class="label">Website / Instagram</span><input v-model="draft.brand.website" class="field" /></label>
       </div>
       <label class="block"><span class="label">Delivery window</span><input v-model="draft.brand.shipWindow" class="field" placeholder="e.g. Ships Feb 15 – Mar 30" /></label>
-      <label class="block"><span class="label">Order minimums</span><input v-model="draft.brand.moq" class="field" placeholder="e.g. $500 opening order, 6 units per style" /></label>
+      <label class="block"><span class="label">Order minimums</span><input v-model="draft.brand.moq" class="field" placeholder="e.g. R5 000 opening order, 6 units per style" /></label>
       <label class="block"><span class="label">Payment terms</span><input v-model="draft.brand.paymentTerms" class="field" /></label>
       <label class="block"><span class="label">Other order terms</span><textarea v-model="draft.brand.orderTerms" rows="2" class="field" placeholder="e.g. Prices exclude shipping. Exclusivity within 2 km." /></label>
       <div>
@@ -289,6 +289,11 @@ async function eraseAll() {
       <p class="text-sm text-stone-500">Clearing your browser's site data deletes everything here. Export a backup first.</p>
       <ConfirmButton label="Erase all data" confirm-label="Tap again to erase everything" @confirm="eraseAll" />
     </section>
+
+    <p class="pb-4 text-center text-xs text-stone-500">
+      Swingtag is free and open source (MIT licence), provided without warranty. Check prices, VAT and invoices before sending.
+      <RouterLink :to="{ path: '/help', query: { s: 'about' } }" class="underline underline-offset-2">Privacy &amp; licence</RouterLink>
+    </p>
   </div>
 
   <Sheet v-if="pending && pendingSummary" title="Import backup" @close="pending = undefined">

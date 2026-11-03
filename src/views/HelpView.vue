@@ -63,6 +63,10 @@ const figClass = (f: Figure) =>
       <p v-for="(t, j) in g.tips" :key="j" class="rounded-lg bg-stone-100 px-3 py-2 text-sm text-stone-700"><span class="font-medium">Tip:</span> {{ t }}</p>
     </div>
 
+    <ul v-if="g.links" class="mt-4 flex flex-wrap gap-2">
+      <li v-for="l in g.links" :key="l.href"><a :href="l.href" target="_blank" rel="noopener" class="btn-secondary py-2">{{ l.label }} <Icon name="right" :size="16" /></a></li>
+    </ul>
+
     <InstallGuide v-if="g.widget === 'install'" />
 
     <div v-if="g.figures.length" class="-mx-4 mt-6 flex snap-x gap-5 overflow-x-auto px-4 pb-3 md:mx-0 md:flex-wrap md:overflow-visible md:px-0">
@@ -75,5 +79,5 @@ const figClass = (f: Figure) =>
     </div>
   </article>
 
-  <p class="flex items-center gap-2 text-sm text-stone-500"><Icon name="check" :size="16" /> Screenshots use made-up demo data.</p>
+  <p class="text-sm text-stone-500">Screenshots use made-up demo data. Swingtag is free and open source under the MIT licence, provided without warranty.</p>
 </template>
