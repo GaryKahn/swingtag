@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Icon from './Icon.vue'
-defineProps<{ title: string; back?: string; subtitle?: string }>()
+defineProps<{ title: string; back?: string; subtitle?: string; help?: string }>()
 </script>
 
 <template>
@@ -10,6 +10,9 @@ defineProps<{ title: string; back?: string; subtitle?: string }>()
       <h1 class="h1 truncate">{{ title }}</h1>
       <p v-if="subtitle" class="mt-1 text-sm text-stone-500">{{ subtitle }}</p>
     </div>
-    <div class="flex shrink-0 items-center gap-2"><slot /></div>
+    <div class="flex shrink-0 items-center gap-2">
+      <slot />
+      <RouterLink v-if="help" :to="{ path: '/help', query: { s: help } }" class="btn-ghost px-2" :aria-label="`Help: ${title}`" title="Help"><Icon name="help" :size="22" /></RouterLink>
+    </div>
   </header>
 </template>

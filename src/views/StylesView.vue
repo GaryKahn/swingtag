@@ -11,6 +11,24 @@ import { useLive, useSettings } from '../lib/live'
 import { price } from '../lib/pricing'
 import { formatMoney } from '../lib/money'
 import { createStyle } from '../lib/records'
+import { installPrompt, installed, isPhone, promptInstall } from '../lib/install'
+
+const HINT_KEY = 'costsheet.installHintDismissed'
+const hintDismissed = ref(true)
+try {
+  hintDismissed.value = localStorage.getItem(HINT_KEY) === '1'
+} catch {
+  /* storage unavailable: keep hidden */
+}
+const showInstallHint = computed(() => !installed.value && !hintDismissed.value && isPhone())
+function dismissHint() {
+  hintDismissed.value = true
+  try {
+    localStorage.setItem(HINT_KEY, '1')
+  } catch {
+    /* ignore */
+  }
+}
 
 const router = useRouter()
 const settings = useSettings()
@@ -35,9 +53,20 @@ async function start(t?: Template) {
 </script>
 
 <template>
-  <PageHeader title="Styles" subtitle="Every garment you're costing.">
+  <PageHeader title="Styles" help="cost" subtitle="Every garment you're costing.">
     <button class="btn-primary" @click="choosing = true"><Icon name="plus" :size="18" /> New</button>
   </PageHeader>
+
+  <div v-if="showInstallHint" class="mb-4 flex items-center gap-3 rounded-xl bg-ink p-3 pl-4 text-white">
+    <Icon name="phone" :size="22" class="shrink-0" />
+    <div class="min-w-0 flex-1 text-sm">
+      <div class="font-medium">Install Costsheet on your phone</div>
+      <div class="text-xs text-white/70">Opens like an app, works offline, keeps your data safer.</div>
+    </div>
+    <button v-if="installPrompt" class="shrink-0 rounded-lg bg-white px-3 py-1.5 text-sm font-medium text-ink" @click="promptInstall()">Install</button>
+    <RouterLink v-else :to="{ path: '/help', query: { s: 'install' } }" class="shrink-0 rounded-lg bg-white px-3 py-1.5 text-sm font-medium text-ink">How</RouterLink>
+    <button class="shrink-0 p-1 text-white/70 hover:text-white" aria-label="Dismiss" @click="dismissHint"><Icon name="x" :size="18" /></button>
+  </div>
 
   <input v-if="styles.length > 4" v-model="q" class="field mb-4" placeholder="Search styles…" />
 
@@ -45,6 +74,7 @@ async function start(t?: Template) {
     <p class="font-serif text-xl">Cost your first garment</p>
     <p class="mx-auto mt-2 max-w-sm text-sm text-stone-500">Start from a template like a T-shirt or button-up shirt, then adjust the fabric, trims and labor to match your piece.</p>
     <button class="btn-primary mt-5" @click="choosing = true">Start a style</button>
+    <RouterLink to="/help" class="mt-3 block text-sm text-stone-500 underline underline-offset-2">New here? Read the quick guides</RouterLink>
   </div>
 
   <ul class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">

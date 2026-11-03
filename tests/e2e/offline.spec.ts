@@ -30,6 +30,11 @@ test('cost a style, then work fully offline: reload, line sheet PDF, backup', as
   const pdf = readFileSync((await (await dl).path())!)
   expect(pdf.subarray(0, 4).toString()).toBe('%PDF')
 
+  const xl = page.waitForEvent('download')
+  await page.getByRole('button', { name: /Order sheet/ }).click()
+  const xlsx = readFileSync((await (await xl).path())!)
+  expect(xlsx.subarray(0, 2).toString()).toBe('PK') // zip container
+
   await page.goto('./#/settings')
   const bk = page.waitForEvent('download')
   await page.getByRole('button', { name: /Export backup/ }).click()

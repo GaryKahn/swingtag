@@ -28,7 +28,7 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,png,svg,woff2}'],
+        globPatterns: ['**/*.{js,css,html,png,jpg,svg,woff2}'],
         // pdfmake + embedded fonts is a large chunk; precache it so PDFs work offline
         maximumFileSizeToCacheInBytes: 8 * 1024 * 1024,
       },

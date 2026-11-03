@@ -27,7 +27,7 @@ const hiddenCount = computed(() => all.value.filter((c) => c.hidden).length)
 
 function open(c?: Component) {
   isNew.value = !c
-  editing.value = c ? { ...c } : blankComponent()
+  editing.value = c ? { ...c } : blankComponent(settings.value.measurement)
 }
 async function save() {
   if (!editing.value) return
@@ -42,7 +42,7 @@ async function remove() {
 </script>
 
 <template>
-  <PageHeader title="Components" subtitle="Your library of fabrics, trims, labels and packaging with what you pay for each.">
+  <PageHeader title="Components" help="library" subtitle="Your library of fabrics, trims, labels and packaging with what you pay for each.">
     <button class="btn-primary" @click="open()"><Icon name="plus" :size="18" /> New</button>
   </PageHeader>
 

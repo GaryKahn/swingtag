@@ -5,7 +5,7 @@ export function formatMoney(n: number, currency: string, locale?: string) {
   let f = cache.get(key)
   if (!f) {
     try {
-      f = new Intl.NumberFormat(locale, { style: 'currency', currency })
+      f = new Intl.NumberFormat(locale, { style: 'currency', currency, currencyDisplay: 'narrowSymbol' })
     } catch {
       f = new Intl.NumberFormat(locale, { style: 'currency', currency: 'USD' })
     }
@@ -16,4 +16,4 @@ export function formatMoney(n: number, currency: string, locale?: string) {
 
 export const pct = (n: number) => `${(Math.round(n * 10) / 10).toString()}%`
 
-export const CURRENCIES = ['USD', 'CAD', 'EUR', 'GBP', 'AUD', 'NZD', 'JPY', 'CHF', 'SEK', 'DKK', 'NOK', 'MXN', 'BRL', 'INR', 'ZAR', 'SGD', 'HKD', 'KRW', 'CNY']
+export const CURRENCIES = ['ZAR', 'USD', 'CAD', 'EUR', 'GBP', 'AUD', 'NZD', 'JPY', 'CHF', 'SEK', 'DKK', 'NOK', 'MXN', 'BRL', 'INR', 'SGD', 'HKD', 'KRW', 'CNY']

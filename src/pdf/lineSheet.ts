@@ -2,6 +2,7 @@ import type { Content, TableCell } from 'pdfmake/interfaces'
 import type { LineSheet, Settings, Style } from '../db/types'
 import { price } from '../lib/pricing'
 import { formatMoney } from '../lib/money'
+import { parseColourways, parseSizes } from '../lib/sizes'
 import { MUTED, RULE, croppedPhoto, deliverPdf, photoDataUrl, safeName } from './common'
 
 const PAGE_W = { LETTER: 612, A4: 595.28 }
@@ -137,6 +138,7 @@ export async function lineSheetPdf(sheet: LineSheet, styles: Style[], settings: 
         { canvas: [{ type: 'line', x1: 0, y1: 0, x2: contentW, y2: 0, lineWidth: 1, lineColor: '#1c1917' }], margin: [0, 0, 0, 16] },
         styles.length ? body : { text: 'No styles selected.', color: MUTED },
         ...termsBlock,
+        ...(sheet.includeOrderForm && styles.length ? orderForm(styles, settings, contentW) : []),
       ],
       footer: (page, pages) => ({
         columns: [
@@ -150,4 +152,45 @@ export async function lineSheetPdf(sheet: LineSheet, styles: Style[], settings: 
     prefer,
     win,
   )
+}
+
+/** Printable order form: buyer details plus a qty box per size for each style/colour. */
+function orderForm(styles: Style[], settings: Settings, contentW: number): Content[] {
+  const money = (n: number) => formatMoney(n, settings.currency, settings.locale)
+  const field = (label: string, w = contentW / 2 - 12): Content => ({
+    stack: [{ text: label, style: 'label' }, { canvas: [{ type: 'line', x1: 0, y1: 16, x2: w, y2: 16, lineWidth: 0.5, lineColor: '#a8a29e' }] }],
+    margin: [0, 0, 0, 8],
+  })
+  // pdfmake mutates nodes during layout, so every box must be its own object
+  const box = (): Content => ({ canvas: [{ type: 'rect', x: 0, y: 0, w: 26, h: 16, lineWidth: 0.5, lineColor: '#a8a29e' }] })
+  const sizeGrid = (sizes: string[]): Content => ({
+    table: {
+      body: [sizes.map((s) => ({ text: s, fontSize: 7, color: MUTED, alignment: 'center' })), sizes.map(() => box())],
+      widths: sizes.map(() => 26),
+    },
+    layout: { hLineWidth: () => 0, vLineWidth: () => 0, paddingLeft: () => 1, paddingRight: () => 1, paddingTop: () => 0, paddingBottom: () => 1 },
+  })
+  const head: TableCell[] = ['STYLE', 'COLOUR', 'QTY PER SIZE', 'TOTAL', 'WSP'].map((t, i) => ({ text: t, style: 'th', alignment: i >= 3 ? 'right' : 'left' }))
+  const rows: TableCell[][] = styles.flatMap((s) => {
+    const sizes = parseSizes(s.sizeRange)
+    const wsp = money(price(s, settings).wholesale)
+    return parseColourways(s.colorways).map((c) => [
+      { stack: [{ text: s.styleNumber, style: 'muted' }, { text: s.name, bold: true }] },
+      { text: c || '—' },
+      sizeGrid(sizes),
+      { canvas: [{ type: 'rect', x: 0, y: 6, w: 34, h: 16, lineWidth: 0.5, lineColor: '#a8a29e' }], alignment: 'right' },
+      { text: wsp, alignment: 'right', margin: [0, 8, 0, 0] },
+    ] as TableCell[])
+  })
+  return [
+    { text: 'ORDER FORM', style: 'brand', pageBreak: 'before', margin: [0, 0, 0, 4] },
+    { text: 'Fill in quantities per size and return to us by email or in person.', style: 'muted', margin: [0, 0, 0, 12] },
+    { columns: [{ stack: [field('Store name'), field('Buyer / contact'), field('Email'), field('Phone')] }, { stack: [field('Billing address'), field('Delivery address'), field('PO number'), field('Date')] }], columnGap: 24 },
+    {
+      margin: [0, 8, 0, 0],
+      table: { headerRows: 1, dontBreakRows: true, widths: [110, 70, '*', 40, 60], body: [head, ...rows] },
+      layout: { hLineWidth: (i: number) => (i === 0 ? 0 : 0.5), vLineWidth: () => 0, hLineColor: () => RULE, paddingTop: () => 6, paddingBottom: () => 6, paddingLeft: (i: number) => (i === 0 ? 0 : 6), paddingRight: () => 0 },
+    },
+    { columns: [{ text: '' }, { width: 200, stack: [field('Signature', 200), field('Total units', 200)] }], margin: [0, 18, 0, 0] },
+  ]
 }

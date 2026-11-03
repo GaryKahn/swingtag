@@ -6,17 +6,21 @@ import NumberField from '../components/NumberField.vue'
 import Sheet from '../components/Sheet.vue'
 import ConfirmButton from '../components/ConfirmButton.vue'
 import { db, requestPersist } from '../db/schema'
-import { defaultSettings, seed } from '../db/seed'
+import { normalizeSettings, seed } from '../db/seed'
 import type { Rounding, Settings } from '../db/types'
 import { saveSettings, useAutosave, useSettings } from '../lib/live'
 import { CURRENCIES, formatMoney } from '../lib/money'
 import { roundPrice } from '../lib/pricing'
 import { backupFilename, exportData, importData, parseBackup, summarize, type Backup, type ImportMode } from '../lib/backup'
 import { forgetPhotoUrls, photoUrl, savePhoto } from '../lib/images'
+import { switchMeasurement } from '../lib/units'
+import type { BankDetails, Brand, Measurement } from '../db/types'
+import { formatDocNumber } from '../lib/orders'
+import { installed } from '../lib/install'
 
 const live = useSettings()
 const draft = ref<Settings>()
-onMounted(async () => (draft.value = (await db.settings.get('settings')) ?? defaultSettings()))
+onMounted(async () => (draft.value = normalizeSettings(await db.settings.get('settings'))))
 // Settings can also change from an import, so re-read when the live copy changes underneath us
 watch(live, (s) => {
   if (draft.value && s.lastExportAt !== draft.value.lastExportAt) draft.value = { ...draft.value, lastExportAt: s.lastExportAt }
@@ -38,6 +42,34 @@ const currencyName = (c: string) => {
     return c
   }
 }
+
+// --- units
+const switching = ref(false)
+async function setMeasurement(m: Measurement) {
+  if (!draft.value || draft.value.measurement === m) return
+  switching.value = true
+  await switchMeasurement(db, m)
+  draft.value.measurement = m
+  switching.value = false
+  msg.value = m === 'metric' ? 'Switched to metres. Your component prices and template quantities were converted.' : 'Switched to yards. Your component prices and template quantities were converted.'
+}
+
+const companyFields: { key: keyof Brand; label: string; placeholder?: string; textarea?: boolean }[] = [
+  { key: 'legalName', label: 'Registered business name', placeholder: 'e.g. Atelier Nord (Pty) Ltd' },
+  { key: 'address', label: 'Business address', textarea: true },
+  { key: 'regNo', label: 'Company reg. no.' },
+  { key: 'vatNo', label: 'VAT no.' },
+]
+const bankFields: { key: keyof BankDetails; label: string; placeholder?: string }[] = [
+  { key: 'accountName', label: 'Account holder' },
+  { key: 'bankName', label: 'Bank', placeholder: 'e.g. FNB, Standard Bank, Capitec' },
+  { key: 'accountNumber', label: 'Account number' },
+  { key: 'accountType', label: 'Account type', placeholder: 'e.g. Business cheque' },
+  { key: 'branchCode', label: 'Branch code', placeholder: 'e.g. 250655' },
+  { key: 'swift', label: 'SWIFT / BIC', placeholder: 'For payments from abroad' },
+  { key: 'iban', label: 'IBAN', placeholder: 'If you have one' },
+  { key: 'reference', label: 'Payment reference', placeholder: 'Blank = invoice number' },
+]
 
 // --- logo
 const logoUrl = ref<string>()
@@ -137,7 +169,7 @@ onMounted(async () => {
 })
 
 async function eraseAll() {
-  await Promise.all([db.styles.clear(), db.photos.clear(), db.lineSheets.clear(), db.templates.clear(), db.components.clear(), db.settings.clear()])
+  await Promise.all([db.styles.clear(), db.photos.clear(), db.lineSheets.clear(), db.orders.clear(), db.templates.clear(), db.components.clear(), db.settings.clear()])
   await seed(db)
   draft.value = await db.settings.get('settings')
   msg.value = 'All data erased. The built-in templates are back.'
@@ -145,9 +177,14 @@ async function eraseAll() {
 </script>
 
 <template>
-  <PageHeader title="Settings" subtitle="Saved on this device only. Nothing is uploaded." />
+  <PageHeader title="Settings" help="setup" subtitle="Saved on this device only. Nothing is uploaded." />
 
   <div v-if="draft" class="max-w-2xl space-y-5">
+    <RouterLink to="/help" class="card flex items-center gap-3 p-4 hover:border-stone-400">
+      <Icon name="help" :size="24" />
+      <span class="flex-1"><span class="block font-medium">Help &amp; guides</span><span class="block text-xs text-stone-500">Step-by-step guides with screenshots</span></span>
+      <Icon name="right" :size="18" />
+    </RouterLink>
     <section class="card space-y-3 p-4">
       <h2 class="h2">Back up or move to another device</h2>
       <p class="text-sm text-stone-500">Your work lives in this browser. Export a backup file to keep it safe, or import it on your phone or laptop to carry on there.</p>
@@ -165,7 +202,7 @@ async function eraseAll() {
       <div class="grid grid-cols-2 gap-3">
         <label><span class="label">Target wholesale margin</span><NumberField v-model="draft.marginPct" suffix="%" /></label>
         <label><span class="label">Retail multiplier</span><NumberField v-model="draft.retailMultiplier" suffix="×" /></label>
-        <label><span class="label">Fabric & trim wastage</span><NumberField v-model="draft.wastagePct" suffix="%" /></label>
+        <label><span class="label">Fabric &amp; trim wastage</span><NumberField v-model="draft.wastagePct" suffix="%" /></label>
         <label><span class="label">Currency</span>
           <select v-model="draft.currency" class="field">
             <option v-for="c in CURRENCIES" :key="c" :value="c">{{ c }} · {{ currencyName(c) }}</option>
@@ -179,6 +216,38 @@ async function eraseAll() {
           <button v-for="r in roundings" :key="r.id" class="btn-secondary px-1 text-xs" :class="{ '!border-ink !bg-ink !text-white': draft.rounding === r.id }" @click="draft.rounding = r.id">{{ r.label }}</button>
         </div>
         <p class="mt-1 text-xs text-stone-500">e.g. 41.30 → {{ sample }}</p>
+      </div>
+    </section>
+
+    <section class="card space-y-3 p-4">
+      <h2 class="h2">Units</h2>
+      <div class="grid grid-cols-2 gap-2">
+        <button class="btn-secondary" :disabled="switching" :class="{ '!border-ink !bg-ink !text-white': draft.measurement === 'metric' }" @click="setMeasurement('metric')">Metric (metres)</button>
+        <button class="btn-secondary" :disabled="switching" :class="{ '!border-ink !bg-ink !text-white': draft.measurement === 'imperial' }" @click="setMeasurement('imperial')">Imperial (yards)</button>
+      </div>
+      <p class="text-xs text-stone-500">Switching converts the fabric prices in your component library and the quantities in your templates. Styles you've already costed keep their own units.</p>
+    </section>
+
+    <section class="card space-y-3 p-4">
+      <h2 class="h2">Invoices</h2>
+      <div class="grid grid-cols-3 gap-3">
+        <label><span class="label">Number prefix</span><input v-model="draft.invoicePrefix" class="field" /></label>
+        <label><span class="label">Next number</span><NumberField v-model="draft.nextInvoiceNumber" /></label>
+        <label><span class="label">Default VAT</span><NumberField v-model="draft.vatPct" suffix="%" /></label>
+      </div>
+      <p class="text-xs text-stone-500">Next order will be {{ formatDocNumber(draft.invoicePrefix, draft.nextInvoiceNumber) }}. In South Africa, charge 15% VAT only if you're VAT-registered.</p>
+      <label v-for="f in companyFields" :key="f.key" class="block">
+        <span class="label">{{ f.label }}</span>
+        <textarea v-if="f.textarea" v-model="(draft.brand[f.key] as string)" rows="3" class="field" :placeholder="f.placeholder" />
+        <input v-else v-model="(draft.brand[f.key] as string)" class="field" :placeholder="f.placeholder" />
+      </label>
+    </section>
+
+    <section class="card space-y-3 p-4">
+      <h2 class="h2">Bank details</h2>
+      <p class="text-xs text-stone-500">Printed on invoices so stores know where to pay. Stays on this device and in your backups only.</p>
+      <div class="grid gap-3 sm:grid-cols-2">
+        <label v-for="f in bankFields" :key="f.key"><span class="label">{{ f.label }}</span><input v-model="draft.brand.bank[f.key]" class="field" :placeholder="f.placeholder" autocomplete="off" /></label>
       </div>
     </section>
 
@@ -214,6 +283,8 @@ async function eraseAll() {
 
     <section class="card space-y-2 p-4">
       <h2 class="h2">This device</h2>
+      <p v-if="installed" class="flex items-center gap-2 text-sm text-emerald-700"><Icon name="check" :size="16" /> Installed as an app</p>
+      <p v-else class="text-sm text-stone-500">Not installed. <RouterLink :to="{ path: '/help', query: { s: 'install' } }" class="underline underline-offset-2">How to add Costsheet to your home screen</RouterLink></p>
       <p v-if="usage" class="text-sm text-stone-500">{{ usage }}</p>
       <p class="text-sm text-stone-500">Clearing your browser's site data deletes everything here. Export a backup first.</p>
       <ConfirmButton label="Erase all data" confirm-label="Tap again to erase everything" @confirm="eraseAll" />
@@ -226,6 +297,7 @@ async function eraseAll() {
       <li>{{ pendingSummary.styles }} styles</li>
       <li>{{ pendingSummary.photos }} photos</li>
       <li>{{ pendingSummary.lineSheets }} line sheets</li>
+      <li>{{ pendingSummary.orders }} orders</li>
       <li>{{ pendingSummary.templates }} custom templates</li>
       <li>{{ pendingSummary.components }} custom components</li>
     </ul>

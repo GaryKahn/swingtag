@@ -1,8 +1,9 @@
 import type { CostsheetDB } from '../db/schema'
-import type { Component, LineSheet, Photo, Settings, Style, Template } from '../db/types'
+import type { Component, LineSheet, Order, Photo, Settings, Style, Template } from '../db/types'
+import { normalizeSettings } from '../db/seed'
 
 export const APP_ID = 'costsheet'
-export const SCHEMA_VERSION = 1
+export const SCHEMA_VERSION = 2
 
 interface PhotoJSON {
   id: string
@@ -23,6 +24,7 @@ export interface Backup {
   templates: Template[]
   styles: Style[]
   lineSheets: LineSheet[]
+  orders: Order[]
   photos: PhotoJSON[]
 }
 
@@ -41,12 +43,13 @@ function fromBase64(data: string, type: string): Blob {
 }
 
 export async function exportData(db: CostsheetDB): Promise<Backup> {
-  const [settings, components, templates, styles, lineSheets, photos] = await Promise.all([
+  const [settings, components, templates, styles, lineSheets, orders, photos] = await Promise.all([
     db.settings.get('settings'),
     db.components.toArray(),
     db.templates.toArray(),
     db.styles.toArray(),
     db.lineSheets.toArray(),
+    db.orders.toArray(),
     db.photos.toArray(),
   ])
   return {
@@ -58,6 +61,7 @@ export async function exportData(db: CostsheetDB): Promise<Backup> {
     templates,
     styles,
     lineSheets,
+    orders,
     photos: await Promise.all(
       photos.map(async (p) => ({
         id: p.id,
@@ -86,15 +90,17 @@ export function parseBackup(text: string): Backup {
   return migrate(b as Backup)
 }
 
-/** Upgrade older backup formats in place. Only v1 exists so far. */
+/** Upgrade older backup formats. v1 had no orders and fewer settings fields. */
 function migrate(b: Backup): Backup {
   return {
     ...b,
+    settings: b.settings ? normalizeSettings(b.settings) : null,
     components: b.components ?? [],
     templates: b.templates ?? [],
-    styles: b.styles ?? [],
     lineSheets: b.lineSheets ?? [],
+    orders: b.orders ?? [],
     photos: b.photos ?? [],
+    styles: (b.styles ?? []).map((s) => ({ ...s, origin: s.origin ?? '', hsCode: s.hsCode ?? '' })),
   }
 }
 
@@ -104,6 +110,7 @@ export function summarize(b: Backup) {
     templates: b.templates.filter((t) => !t.builtIn).length,
     components: b.components.filter((c) => !c.builtIn).length,
     lineSheets: b.lineSheets.length,
+    orders: b.orders.length,
     photos: b.photos.length,
   }
 }
@@ -118,7 +125,7 @@ export async function importData(db: CostsheetDB, b: Backup, mode: ImportMode) {
     thumb: fromBase64(p.thumb, p.thumbMime),
     updatedAt: p.updatedAt,
   }))
-  const tables = [db.settings, db.components, db.templates, db.styles, db.lineSheets, db.photos]
+  const tables = [db.settings, db.components, db.templates, db.styles, db.lineSheets, db.orders, db.photos]
   await db.transaction('rw', tables, async () => {
     if (mode === 'replace') {
       await Promise.all(tables.map((t) => t.clear()))
@@ -127,6 +134,7 @@ export async function importData(db: CostsheetDB, b: Backup, mode: ImportMode) {
       await db.templates.bulkPut(b.templates)
       await db.styles.bulkPut(b.styles)
       await db.lineSheets.bulkPut(b.lineSheets)
+      await db.orders.bulkPut(b.orders)
       await db.photos.bulkPut(photos)
       return
     }
@@ -135,6 +143,7 @@ export async function importData(db: CostsheetDB, b: Backup, mode: ImportMode) {
     await mergeInto(db.templates, b.templates)
     await mergeInto(db.styles, b.styles)
     await mergeInto(db.lineSheets, b.lineSheets)
+    await mergeInto(db.orders, b.orders)
     await mergeInto(db.photos, photos)
   })
 }

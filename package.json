@@ -8,10 +8,12 @@
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
     "test": "vitest run",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "screenshots": "vite build && node scripts/screenshots.mjs && vite build"
   },
   "dependencies": {
     "dexie": "^4.4.7",
+    "exceljs": "^4.4.0",
     "pdfmake": "^0.3.13",
     "vue": "^3.5.44",
     "vue-router": "^4.6.4"
@@ -22,6 +24,7 @@
     "@types/pdfmake": "^0.3.3",
     "@vitejs/plugin-vue": "^6.0.10",
     "fake-indexeddb": "^6.2.7",
+    "pdfjs-dist": "^4.10.38",
     "tailwindcss": "^4.3.4",
     "typescript": "^6.0.3",
     "vite": "^6.4.5",

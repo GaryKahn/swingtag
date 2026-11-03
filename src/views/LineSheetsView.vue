@@ -17,7 +17,7 @@ async function create() {
 </script>
 
 <template>
-  <PageHeader title="Line sheets" subtitle="The PDF you send to stores: your styles with wholesale prices and order terms.">
+  <PageHeader title="Line sheets" help="linesheet" subtitle="The PDF you send to stores: your styles with wholesale prices and order terms.">
     <button class="btn-primary" @click="create"><Icon name="plus" :size="18" /> New</button>
   </PageHeader>
 

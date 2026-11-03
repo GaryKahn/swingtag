@@ -1,5 +1,5 @@
 import Dexie, { type Table } from 'dexie'
-import type { Component, LineSheet, Photo, Settings, Style, Template } from './types'
+import type { Component, LineSheet, Order, Photo, Settings, Style, Template } from './types'
 
 export class CostsheetDB extends Dexie {
   settings!: Table<Settings, string>
@@ -8,6 +8,7 @@ export class CostsheetDB extends Dexie {
   styles!: Table<Style, string>
   photos!: Table<Photo, string>
   lineSheets!: Table<LineSheet, string>
+  orders!: Table<Order, string>
 
   constructor(name = 'costsheet') {
     super(name)
@@ -19,6 +20,14 @@ export class CostsheetDB extends Dexie {
       photos: 'id, ownerId',
       lineSheets: 'id, updatedAt',
     })
+    this.version(2)
+      .stores({ orders: 'id, number, updatedAt' })
+      .upgrade(async (tx) => {
+        // Installs from v1 were seeded in yards/USD; keep their library consistent.
+        await tx.table('settings').toCollection().modify((s: Partial<Settings>) => {
+          s.measurement ??= 'imperial'
+        })
+      })
   }
 }
 

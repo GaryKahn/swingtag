@@ -9,23 +9,21 @@ import { useSettings } from '../lib/live'
 const props = defineProps<{ p: PriceBreakdown; compact?: boolean }>()
 const settings = useSettings()
 const money = (n: number) => formatMoney(n, settings.value.currency, settings.value.locale)
+const tiles = computed(() => [
+  { label: 'Cost', value: props.p.landed },
+  { label: 'Wholesale', value: props.p.wholesale },
+  { label: 'Retail', value: props.p.retail },
+])
 const cats = computed(() => CATEGORIES.filter((c) => c.id !== 'labor' && props.p.byCategory[c.id] > 0))
 </script>
 
 <template>
-  <div class="card p-4">
-    <div class="grid grid-cols-3 gap-2 text-center">
-      <div>
-        <div class="label">Cost</div>
-        <div class="text-lg font-semibold tabular-nums">{{ money(p.landed) }}</div>
-      </div>
-      <div>
-        <div class="label">Wholesale</div>
-        <div class="text-lg font-semibold tabular-nums">{{ money(p.wholesale) }}</div>
-      </div>
-      <div>
-        <div class="label">Retail</div>
-        <div class="text-lg font-semibold tabular-nums">{{ money(p.retail) }}</div>
+  <div class="card @container p-4">
+    <!-- three columns when there's room; label/value rows in a narrow sidebar -->
+    <div class="grid gap-1 @[20rem]:grid-cols-3 @[20rem]:gap-2 @[20rem]:text-center">
+      <div v-for="t in tiles" :key="t.label" class="flex items-baseline justify-between @[20rem]:block">
+        <div class="label">{{ t.label }}</div>
+        <div class="text-lg font-semibold whitespace-nowrap tabular-nums">{{ money(t.value) }}</div>
       </div>
     </div>
     <div v-if="p.belowTarget" class="mt-3 flex items-center gap-2 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800">

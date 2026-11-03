@@ -15,6 +15,7 @@ import { price } from '../lib/pricing'
 import { formatMoney } from '../lib/money'
 import { deleteStyle, duplicateStyle, templateFromStyle } from '../lib/records'
 import { canShareFiles } from '../pdf/common'
+import { parseColourways, parseSizes } from '../lib/sizes'
 
 const props = defineProps<{ id: string }>()
 const router = useRouter()
@@ -27,7 +28,7 @@ const toast = ref('')
 watch(() => props.id, async (id) => {
   draft.value = undefined
   const s = await db.styles.get(id)
-  if (s) draft.value = s
+  if (s) draft.value = { ...s, origin: s.origin ?? '', hsCode: s.hsCode ?? '' }
   else notFound.value = true
 }, { immediate: true })
 
@@ -96,7 +97,7 @@ async function remove() {
   </div>
 
   <template v-else-if="draft && p">
-    <PageHeader :title="draft.name || 'Untitled style'" :subtitle="draft.styleNumber" back="/styles">
+    <PageHeader :title="draft.name || 'Untitled style'" help="cost" :subtitle="draft.styleNumber" back="/styles">
       <button class="btn-secondary hidden sm:inline-flex" :disabled="!!busy" @click="pdf"><Icon name="download" :size="18" /> Cost sheet PDF</button>
     </PageHeader>
 
@@ -116,8 +117,17 @@ async function remove() {
           <label class="block"><span class="label">Collection / season</span><input v-model="draft.collection" class="field" placeholder="e.g. SS27" /></label>
           <label class="block"><span class="label">Fabrication / content</span><input v-model="draft.fabrication" class="field" placeholder="e.g. 100% organic cotton poplin" /></label>
           <div class="grid gap-3 sm:grid-cols-2">
-            <label><span class="label">Colorways</span><input v-model="draft.colorways" class="field" placeholder="e.g. Ecru, Navy" /></label>
-            <label><span class="label">Sizes</span><input v-model="draft.sizeRange" class="field" placeholder="e.g. XS–XL" /></label>
+            <label><span class="label">Colourways</span><input v-model="draft.colorways" class="field" placeholder="e.g. Ecru, Navy" /></label>
+            <label><span class="label">Sizes</span><input v-model="draft.sizeRange" class="field" placeholder="e.g. XS–XL or 6–14" /></label>
+          </div>
+          <p class="-mt-1 text-xs text-stone-500">
+            On order sheets:
+            <span class="font-medium text-stone-700">{{ parseColourways(draft.colorways).filter(Boolean).join(' · ') || 'one colour' }}</span>
+            in sizes <span class="font-medium text-stone-700">{{ parseSizes(draft.sizeRange).join(' · ') }}</span>
+          </p>
+          <div class="grid grid-cols-2 gap-3">
+            <label><span class="label">Country of origin</span><input v-model="draft.origin" class="field" placeholder="e.g. South Africa" /></label>
+            <label><span class="label">HS / tariff code</span><input v-model="draft.hsCode" class="field" placeholder="Optional, for export" /></label>
           </div>
           <label class="block"><span class="label">Minimum order (MOQ)</span><input v-model="draft.moq" class="field" placeholder="e.g. 6 units per color" /></label>
           <label class="block"><span class="label">Description</span><textarea v-model="draft.description" rows="2" class="field" /></label>

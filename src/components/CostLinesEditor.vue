@@ -2,9 +2,10 @@
 import { ref } from 'vue'
 import Icon from './Icon.vue'
 import NumberField from './NumberField.vue'
+import Stepper from './Stepper.vue'
 import ComponentPicker from './ComponentPicker.vue'
 import { uid } from '../db/schema'
-import { CATEGORIES, UNITS, type Category, type Component, type Unit } from '../db/types'
+import { CATEGORIES, COUNT_UNITS, UNITS, type Category, type Component, type Unit } from '../db/types'
 import { lineCost } from '../lib/pricing'
 import { formatMoney } from '../lib/money'
 import { useSettings } from '../lib/live'
@@ -60,7 +61,8 @@ function move(i: number, d: number) {
           <select v-model="l.unit" class="field py-2 text-sm" aria-label="Unit">
             <option v-for="u in UNITS" :key="u" :value="u">per {{ u }}</option>
           </select>
-          <label class="block"><span class="sr-only">Quantity</span><NumberField v-model="l.qty" :suffix="l.unit" /></label>
+          <Stepper v-if="COUNT_UNITS.includes(l.unit)" v-model="l.qty" :label="`${l.name || 'line'} quantity`" />
+          <label v-else class="block"><span class="sr-only">Quantity</span><NumberField v-model="l.qty" :suffix="l.unit" /></label>
           <template v-if="withCost">
             <label class="block"><span class="sr-only">Unit cost</span><NumberField v-model="l.unitCost" :suffix="`/${l.unit}`" /></label>
             <div class="flex items-center justify-end text-sm font-medium tabular-nums">

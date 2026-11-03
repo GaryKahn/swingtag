@@ -21,7 +21,7 @@ async function create() {
 </script>
 
 <template>
-  <PageHeader title="Templates" subtitle="Starting points for each garment type.">
+  <PageHeader title="Templates" help="library" subtitle="Starting points for each garment type.">
     <button class="btn-primary" @click="create"><Icon name="plus" :size="18" /> New</button>
   </PageHeader>
 

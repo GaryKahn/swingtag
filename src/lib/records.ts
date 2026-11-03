@@ -1,5 +1,5 @@
 import { db, uid } from '../db/schema'
-import type { Component, LineSheet, Style, Template } from '../db/types'
+import { lengthUnit, type Component, type LineSheet, type Measurement, type Style, type Template } from '../db/types'
 
 export async function createStyle(template?: Template): Promise<string> {
   const now = Date.now()
@@ -16,6 +16,8 @@ export async function createStyle(template?: Template): Promise<string> {
     colorways: '',
     sizeRange: '',
     moq: '',
+    origin: '',
+    hsCode: '',
     lines: (template?.lines ?? []).map((l) => ({
       id: uid(),
       ...l,
@@ -84,8 +86,8 @@ export async function templateFromStyle(s: Style): Promise<string> {
   return t.id
 }
 
-export function blankComponent(): Component {
-  return { id: uid(), name: '', category: 'fabric', unit: 'yd', unitCost: 0, supplier: '', notes: '', builtIn: false, updatedAt: Date.now() }
+export function blankComponent(measurement: Measurement): Component {
+  return { id: uid(), name: '', category: 'fabric', unit: lengthUnit(measurement), unitCost: 0, supplier: '', notes: '', builtIn: false, updatedAt: Date.now() }
 }
 
 export async function createLineSheet(styleIds: string[]): Promise<string> {

@@ -62,6 +62,31 @@ async function make(prefer: 'share' | 'download' | 'preview') {
     busy.value = false
   }
 }
+async function orderSheet() {
+  if (!draft.value) return
+  flush()
+  busy.value = true
+  error.value = ''
+  try {
+    const [{ buildOrderSheet }, { croppedPhoto }, { deliverFile }, { linesForStyle }] = await Promise.all([
+      import('../lib/orderSheet'), import('../pdf/common'), import('../lib/files'), import('../lib/orders'),
+    ])
+    const ls = draft.value
+    const blob = await buildOrderSheet(
+      { title: ls.title, season: ls.season, orderDeadline: ls.orderDeadline, showRetail: ls.showRetail, lines: selected.value.flatMap((s) => linesForStyle(s, settings.value)) },
+      settings.value,
+      (id) => croppedPhoto(id, 3 / 4, 300, 'thumb').then((u) => u?.split(',')[1]),
+    )
+    const name = [settings.value.brand.name, ls.title, ls.season, 'order sheet'].filter(Boolean).join(' ').replace(/[^\w\- ]+/g, '').trim().replace(/\s+/g, '-').toLowerCase()
+    await deliverFile(blob, `${name}.xlsx`, share)
+  } catch (e) {
+    console.error(e)
+    error.value = 'Something went wrong making the order sheet.'
+  } finally {
+    busy.value = false
+  }
+}
+
 async function remove() {
   cancel()
   await db.lineSheets.delete(props.id)
@@ -71,7 +96,7 @@ async function remove() {
 
 <template>
   <template v-if="draft">
-    <PageHeader :title="draft.title || 'Line sheet'" :subtitle="`${selected.length} styles`" back="/linesheets" />
+    <PageHeader :title="draft.title || 'Line sheet'" help="linesheet" :subtitle="`${selected.length} styles`" back="/linesheets" />
 
     <div v-if="!settings.brand.name" class="mb-4 flex items-center gap-2 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-800">
       <Icon name="warn" :size="18" /> Add your brand name, logo and contact details in <RouterLink to="/settings" class="underline">Settings</RouterLink> so they appear on the sheet.
@@ -85,7 +110,7 @@ async function remove() {
             <label><span class="label">Season</span><input v-model="draft.season" class="field" placeholder="e.g. Spring/Summer 2027" /></label>
           </div>
           <label class="block"><span class="label">Order deadline</span><input v-model="draft.orderDeadline" class="field" placeholder="e.g. January 15, 2027" /></label>
-          <label class="block"><span class="label">Notes for buyers</span><textarea v-model="draft.notes" rows="2" class="field" placeholder="e.g. Made in small batches in Montréal" /></label>
+          <label class="block"><span class="label">Notes for buyers</span><textarea v-model="draft.notes" rows="2" class="field" placeholder="e.g. Made in small batches in Cape Town" /></label>
           <div>
             <span class="label">Layout</span>
             <div class="grid grid-cols-3 gap-2">
@@ -136,7 +161,12 @@ async function remove() {
           <h2 class="h2">Export</h2>
           <p class="text-xs text-stone-500">{{ settings.pageSize === 'A4' ? 'A4' : 'US Letter' }} PDF · prices in {{ settings.currency }}</p>
           <button class="btn-primary w-full" :disabled="busy" @click="make('download')"><Icon name="download" :size="18" /> {{ busy ? 'Making PDF…' : 'Download PDF' }}</button>
-          <button v-if="share" class="btn-secondary w-full" :disabled="busy" @click="make('share')"><Icon name="share" :size="18" /> Share…</button>
+          <button v-if="share" class="btn-secondary w-full" :disabled="busy" @click="make('share')"><Icon name="share" :size="18" /> Share PDF…</button>
+          <label class="flex items-center gap-2 text-xs text-stone-600"><input v-model="draft.includeOrderForm" type="checkbox" class="size-4 accent-ink" /> Add a printable order form to the PDF</label>
+          <div class="border-t border-stone-100 pt-2">
+            <button class="btn-secondary w-full" :disabled="busy || !selected.length" @click="orderSheet"><Icon name="table" :size="18" /> Order sheet (.xlsx)</button>
+            <p class="mt-1.5 text-xs text-stone-500">Buyers fill in quantities in Excel, Google Sheets or Numbers and send it back. Import it under Orders.</p>
+          </div>
           <button class="btn-secondary hidden w-full md:inline-flex" :disabled="busy" @click="make('preview')"><Icon name="eye" :size="18" /> Preview in new tab</button>
           <p v-if="error" class="text-xs text-red-700">{{ error }}</p>
         </div>

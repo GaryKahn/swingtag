@@ -1,7 +1,7 @@
 import { liveQuery } from 'dexie'
 import { onScopeDispose, shallowRef, watch, type Ref, type WatchSource } from 'vue'
 import { db } from '../db/schema'
-import { defaultSettings } from '../db/seed'
+import { normalizeSettings } from '../db/seed'
 import type { Settings } from '../db/types'
 
 /** Reactive Dexie query; re-runs when the DB changes (or when `deps` change). */
@@ -22,16 +22,16 @@ let settingsRef: Ref<Settings> | undefined
 /** App-wide settings, kept live. */
 export function useSettings(): Ref<Settings> {
   if (!settingsRef) {
-    settingsRef = shallowRef(defaultSettings())
+    settingsRef = shallowRef(normalizeSettings(undefined))
     liveQuery(() => db.settings.get('settings')).subscribe((s) => {
-      if (s) settingsRef!.value = s
+      if (s) settingsRef!.value = normalizeSettings(s)
     })
   }
   return settingsRef
 }
 
 export async function saveSettings(patch: Partial<Settings>) {
-  const cur = (await db.settings.get('settings')) ?? defaultSettings()
+  const cur = normalizeSettings(await db.settings.get('settings'))
   await db.settings.put({ ...cur, ...patch, id: 'settings' })
 }
 
