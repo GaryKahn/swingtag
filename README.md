@@ -1,5 +1,7 @@
 # Costsheet
 
+**Live:** https://garykahn.github.io/costsheet/
+
 Garment costing and line sheets for independent designers. Mobile-first and installable, and works fully offline.
 There is no login: all data stays in the browser (IndexedDB), and a JSON backup file moves it between devices.
 
@@ -21,6 +23,8 @@ npm run build && npx playwright test   # offline end-to-end test against the pro
 `node scripts/icons.mjs` regenerates the PWA PNG icons from `public/icons/icon.svg`.
 
 ## Deploy
+
+Pushing to `main` runs `.github/workflows/pages.yml`, which tests, builds and deploys to GitHub Pages.
 
 `npm run build` produces a static `dist/` folder with relative paths (`base: './'`) and hash routing, so it runs from any
 static host or subpath: GitHub Pages, Cloudflare Pages, Netlify, or plain S3. The host must serve over HTTPS for the

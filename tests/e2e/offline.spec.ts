@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test'
 import { readFileSync } from 'node:fs'
 
 test('cost a style, then work fully offline: reload, line sheet PDF, backup', async ({ page, context }) => {
-  await page.goto('/')
+  await page.goto('./')
   // wait for the service worker to take control so the app shell is cached
   await page.evaluate(async () => {
     await navigator.serviceWorker.ready
@@ -19,10 +19,10 @@ test('cost a style, then work fully offline: reload, line sheet PDF, backup', as
 
   await context.setOffline(true)
   await page.reload()
-  await page.goto('/#/styles')
+  await page.goto('./#/styles')
   await expect(page.getByText('Camp collar shirt')).toBeVisible()
 
-  await page.goto('/#/linesheets')
+  await page.goto('./#/linesheets')
   await page.getByRole('button', { name: 'Make a line sheet' }).click()
   await expect(page.getByText('Camp collar shirt')).toBeVisible()
   const dl = page.waitForEvent('download')
@@ -30,7 +30,7 @@ test('cost a style, then work fully offline: reload, line sheet PDF, backup', as
   const pdf = readFileSync((await (await dl).path())!)
   expect(pdf.subarray(0, 4).toString()).toBe('%PDF')
 
-  await page.goto('/#/settings')
+  await page.goto('./#/settings')
   const bk = page.waitForEvent('download')
   await page.getByRole('button', { name: /Export backup/ }).click()
   const backup = JSON.parse(readFileSync((await (await bk).path())!, 'utf8'))
