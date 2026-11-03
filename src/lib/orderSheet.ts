@@ -8,6 +8,7 @@ import { uid } from '../db/schema'
  * so a filled-in sheet can be imported as an order.
  */
 
+// Legacy ids from when the app was called Costsheet; kept so sheets already sent to buyers still import.
 const META_SHEET = '_costsheet'
 const INPUT_FILL = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFF6C7' } } as const
 const HEAD_FILL = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1C1917' } } as const
@@ -45,7 +46,7 @@ async function loadExcel() {
 export async function buildOrderSheet(input: OrderSheetInput, settings: Settings, loadImage?: ImageLoader): Promise<Blob> {
   const ExcelJS = await loadExcel()
   const wb: Workbook = new ExcelJS.Workbook()
-  wb.creator = settings.brand.name || 'Costsheet'
+  wb.creator = settings.brand.name || 'Swingtag'
   wb.created = new Date()
   wb.calcProperties.fullCalcOnLoad = true
   const ws = wb.addWorksheet('Order sheet', {
@@ -246,7 +247,7 @@ export async function readOrderSheet(data: ArrayBuffer): Promise<ImportedOrder> 
   const meta = wb.getWorksheet(META_SHEET)
   const ws = wb.getWorksheet('Order sheet') ?? wb.worksheets[0]
   if (!meta || !ws || cellText(meta, 'A1') !== 'costsheet-order-sheet')
-    throw new Error("This spreadsheet wasn't made by Costsheet, so it can't be read automatically. Enter the order by hand instead.")
+    throw new Error("This spreadsheet wasn't made by Swingtag, so it can't be read automatically. Enter the order by hand instead.")
 
   const out: ImportedOrder = {
     store: { name: '', contact: '', email: '', phone: '', address: '' },

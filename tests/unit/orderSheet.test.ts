@@ -52,6 +52,6 @@ describe('order sheet xlsx', () => {
     const wb = new ExcelJS.Workbook()
     wb.addWorksheet('Sheet1').getCell('A1').value = 'hello'
     const buf = await wb.xlsx.writeBuffer()
-    await expect(readOrderSheet(buf as ArrayBuffer)).rejects.toThrow(/wasn't made by Costsheet/)
+    await expect(readOrderSheet(buf as ArrayBuffer)).rejects.toThrow(/wasn't made by Swingtag/)
   })
 })

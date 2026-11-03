@@ -19,11 +19,11 @@ const TABS: Tab[] = [
     label: 'iPhone & iPad',
     icon: 'phone',
     steps: [
-      'Open Costsheet in Safari. (On iOS 16.4 or later, Chrome and Edge work too.)',
+      'Open Swingtag in Safari. (On iOS 16.4 or later, Chrome and Edge work too.)',
       'Tap the Share button {share}. On iPhone it\'s at the bottom of the screen; on iPad it\'s at the top right. In Chrome and Edge it\'s in the address bar.',
       'Scroll down the list and tap Add to Home Screen {plussquare}. Can\'t see it? Tap Edit Actions… at the bottom and add it.',
       'Tap Add in the top-right corner.',
-      'From now on, open Costsheet from its icon on your Home Screen.',
+      'From now on, open Swingtag from its icon on your Home Screen.',
     ],
     warn: 'On iPhone and iPad, the Home Screen app keeps its own storage, separate from Safari. Anything you made in Safari before installing won\'t appear in the app. Move it across with Settings → Export backup in Safari, then Settings → Import backup in the app.',
   },
@@ -32,13 +32,13 @@ const TABS: Tab[] = [
     label: 'Android',
     icon: 'phone',
     steps: [
-      'Open Costsheet in Chrome.',
+      'Open Swingtag in Chrome.',
       'If an Install banner appears, tap it. Otherwise tap the menu {dots} at the top right.',
       'Tap Add to Home screen (or Install app), then Install.',
       'Samsung Internet: tap the menu {menu} at the bottom right, then Add page to → Home screen.',
       'Firefox: tap the menu {dots}, then Add to Home screen.',
     ],
-    note: 'Costsheet then opens full screen from its icon and appears in your app drawer.',
+    note: 'Swingtag then opens full screen from its icon and appears in your app drawer.',
   },
   {
     id: 'desktop',
@@ -48,7 +48,7 @@ const TABS: Tab[] = [
       'Click the install icon {installpc} at the right-hand end of the address bar.',
       'No icon? In Chrome: menu {dots} → Cast, save and share → Install page as app…',
       'In Edge: menu (…) → Apps → Install this site as an app.',
-      'Click Install. Costsheet opens in its own window and appears with your other apps (Start menu, Launchpad or Applications).',
+      'Click Install. Swingtag opens in its own window and appears with your other apps (Start menu, Launchpad or Applications).',
     ],
   },
   {
@@ -57,8 +57,8 @@ const TABS: Tab[] = [
     icon: 'laptop',
     steps: [
       'Requires macOS Sonoma (14) or later.',
-      'With Costsheet open, choose File → Add to Dock {dock} (or click Share {share} → Add to Dock).',
-      'Click Add. Costsheet opens from the Dock in its own window.',
+      'With Swingtag open, choose File → Add to Dock {dock} (or click Share {share} → Add to Dock).',
+      'Click Add. Swingtag opens from the Dock in its own window.',
     ],
     warn: 'Like on iPhone, the Dock app keeps its own storage, separate from Safari. Use Export/Import backup to move anything you made in Safari before.',
   },
@@ -94,7 +94,7 @@ async function install() {
       <Icon name="check" :size="18" /> You're using the installed app. It works offline and opens from its icon.
     </div>
     <div v-else-if="installPrompt" class="flex flex-wrap items-center gap-3 bg-stone-50 px-4 py-3">
-      <span class="flex-1 text-sm">This browser can install Costsheet in one tap.</span>
+      <span class="flex-1 text-sm">This browser can install Swingtag in one tap.</span>
       <button class="btn-primary py-2" :disabled="busy" @click="install"><Icon name="download" :size="18" /> Install app</button>
     </div>
 

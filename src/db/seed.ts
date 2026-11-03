@@ -1,5 +1,5 @@
 import type { Category, Component, Settings, Template, TemplateLine, Unit } from './types'
-import type { CostsheetDB } from './schema'
+import type { SwingtagDB } from './schema'
 
 /** Bump when built-in components/templates change; seeding only adds missing built-ins. */
 export const SEED_VERSION = 1
@@ -103,7 +103,7 @@ const TEMPLATES: T[] = [
   ['t-tote', 'Tote bag', 80, [line('c-canvas', 0.7), line('c-thread', 1), line('c-label-main', 1), line('c-polybag', 1)]],
 ]
 
-export async function seed(db: CostsheetDB) {
+export async function seed(db: SwingtagDB) {
   const stored = await db.settings.get('settings')
   const settings = stored ? normalizeSettings(stored) : defaultSettings()
   if (settings.seededVersion >= SEED_VERSION) {

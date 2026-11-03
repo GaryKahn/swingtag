@@ -23,7 +23,7 @@ export const GUIDES: Guide[] = [
     id: 'start',
     title: 'Getting started',
     summary: 'Install it, use it offline, keep your work safe.',
-    intro: 'Costsheet runs in your browser and saves everything on your device. There is no account or login, and nothing is uploaded.',
+    intro: 'Swingtag runs in your browser and saves everything on your device. There is no account or login, and nothing is uploaded.',
     steps: [
       'Open the link once while you have internet. After that it works without a connection.',
       'Install it to your home screen so it opens like an app. See the next guide, "Install on your phone or computer", for steps for your device.',
@@ -36,9 +36,9 @@ export const GUIDES: Guide[] = [
   {
     id: 'install',
     title: 'Install on your phone or computer',
-    summary: 'Add Costsheet to your home screen, dock or desktop.',
+    summary: 'Add Swingtag to your home screen, dock or desktop.',
     intro:
-      'Installing puts a Costsheet icon on your home screen. It then opens full screen like any other app, works offline, and your browser is much less likely to clear its data. It takes about 20 seconds and there is no app store involved.',
+      'Installing puts a Swingtag icon on your home screen. It then opens full screen like any other app, works offline, and your browser is much less likely to clear its data. It takes about 20 seconds and there is no app store involved.',
     tips: ['On iPhone, install before you start working, because the installed app and Safari keep separate data.'],
     widget: 'install',
     figures: [],
@@ -86,7 +86,7 @@ export const GUIDES: Guide[] = [
     id: 'pricing',
     title: 'How prices are worked out',
     summary: 'From cost to wholesale to retail, with a worked example.',
-    intro: 'Costsheet adds up your landed cost, then sets your wholesale price from your target margin and the suggested retail price from a multiplier.',
+    intro: 'Swingtag adds up your landed cost, then sets your wholesale price from your target margin and the suggested retail price from a multiplier.',
     steps: [
       'Materials: quantity × unit cost for each component. Fabric and trims get the wastage allowance added (10% by default) for cutting loss.',
       'Landed cost = materials + labor + overhead, plus freight & duty if you import.',
@@ -145,7 +145,7 @@ export const GUIDES: Guide[] = [
       'Go to Orders → Import filled-in order sheet and choose the file. The order is created with their details and quantities.',
     ],
     tips: [
-      "Ask buyers not to delete rows or rename the tab. Hidden information in the file tells Costsheet which cell is which.",
+      "Ask buyers not to delete rows or rename the tab. Hidden information in the file tells Swingtag which cell is which.",
       'No spreadsheet app? Use the printable order form in the PDF, or simply enter the order yourself (next guide).',
     ],
     figures: [{ src: img('orders-empty'), alt: 'Orders page with the import button', kind: 'phone' }],
@@ -175,10 +175,10 @@ export const GUIDES: Guide[] = [
     steps: [
       'Settings → Export backup saves one file with everything, photos included.',
       'Keep it somewhere safe: email it to yourself, or save it to Google Drive or iCloud.',
-      'On another device, open Costsheet and go to Settings → Import backup.',
+      'On another device, open Swingtag and go to Settings → Import backup.',
       'Choose Merge to add it to what is already there (where both have the same item, the most recently edited one wins), or Replace to make the device an exact copy.',
     ],
-    tips: ["On iPhone, Safari can clear a website's data after a few weeks without visits. Installing Costsheet to your home screen prevents this. Backups are still a good idea."],
+    tips: ["On iPhone, Safari can clear a website's data after a few weeks without visits. Installing Swingtag to your home screen prevents this. Backups are still a good idea."],
     figures: [{ src: img('backup'), alt: 'Export and import backup buttons', kind: 'card' }],
   },
 ]

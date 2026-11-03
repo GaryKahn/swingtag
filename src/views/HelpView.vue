@@ -35,7 +35,7 @@ const figClass = (f: Figure) =>
 </script>
 
 <template>
-  <PageHeader title="Help & guides" subtitle="How to cost, price, sell and invoice with Costsheet." />
+  <PageHeader title="Help & guides" subtitle="How to cost, price, sell and invoice with Swingtag." />
 
   <nav class="mb-8 grid gap-2 sm:grid-cols-2 lg:grid-cols-3" aria-label="Guides">
     <button v-for="(g, i) in GUIDES" :key="g.id" class="card flex gap-3 p-3 text-left hover:border-stone-400" @click="router.replace({ query: { s: g.id } })">

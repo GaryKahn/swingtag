@@ -284,7 +284,7 @@ async function eraseAll() {
     <section class="card space-y-2 p-4">
       <h2 class="h2">This device</h2>
       <p v-if="installed" class="flex items-center gap-2 text-sm text-emerald-700"><Icon name="check" :size="16" /> Installed as an app</p>
-      <p v-else class="text-sm text-stone-500">Not installed. <RouterLink :to="{ path: '/help', query: { s: 'install' } }" class="underline underline-offset-2">How to add Costsheet to your home screen</RouterLink></p>
+      <p v-else class="text-sm text-stone-500">Not installed. <RouterLink :to="{ path: '/help', query: { s: 'install' } }" class="underline underline-offset-2">How to add Swingtag to your home screen</RouterLink></p>
       <p v-if="usage" class="text-sm text-stone-500">{{ usage }}</p>
       <p class="text-sm text-stone-500">Clearing your browser's site data deletes everything here. Export a backup first.</p>
       <ConfirmButton label="Erase all data" confirm-label="Tap again to erase everything" @confirm="eraseAll" />

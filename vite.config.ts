@@ -13,8 +13,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['icons/*.png', 'icons/*.svg'],
       manifest: {
-        name: 'Costsheet — garment costing & line sheets',
-        short_name: 'Costsheet',
+        name: 'Swingtag — costing, line sheets & orders for designers',
+        short_name: 'Swingtag',
         description: 'Cost garments, set wholesale and retail prices, and make line sheets. Works offline.',
         theme_color: '#1c1917',
         background_color: '#faf9f7',

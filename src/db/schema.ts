@@ -1,7 +1,7 @@
 import Dexie, { type Table } from 'dexie'
 import type { Component, LineSheet, Order, Photo, Settings, Style, Template } from './types'
 
-export class CostsheetDB extends Dexie {
+export class SwingtagDB extends Dexie {
   settings!: Table<Settings, string>
   components!: Table<Component, string>
   templates!: Table<Template, string>
@@ -10,6 +10,7 @@ export class CostsheetDB extends Dexie {
   lineSheets!: Table<LineSheet, string>
   orders!: Table<Order, string>
 
+  // The app was first called Costsheet; the database keeps that name so existing data stays put.
   constructor(name = 'costsheet') {
     super(name)
     this.version(1).stores({
@@ -31,7 +32,7 @@ export class CostsheetDB extends Dexie {
   }
 }
 
-export const db = new CostsheetDB()
+export const db = new SwingtagDB()
 
 export const uid = () =>
   globalThis.crypto?.randomUUID?.() ?? `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`

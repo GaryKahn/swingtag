@@ -10,7 +10,7 @@
 - Orders with per-size/colour quantities, invoice / pro forma / confirmation PDFs with bank & company details
 - Excel order sheet export (photos, formulas) and import of filled-in sheets; printable order form in line sheet PDF
 - In-app Help & guides with generated screenshots (`npm run screenshots`), contextual ? links on every page
-- Deployed to GitHub Pages: https://garykahn.github.io/costsheet/ (auto-deploys on push to main)
+- Deployed to GitHub Pages: https://garykahn.github.io/swingtag/ (auto-deploys on push to main)
 
 ## Next steps
 1. **Real-device pass**: test on an iPhone (Safari) and an Android phone: camera upload, share sheet, install, offline,

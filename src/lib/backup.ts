@@ -1,7 +1,8 @@
-import type { CostsheetDB } from '../db/schema'
+import type { SwingtagDB } from '../db/schema'
 import type { Component, LineSheet, Order, Photo, Settings, Style, Template } from '../db/types'
 import { normalizeSettings } from '../db/seed'
 
+// Legacy id from when the app was called Costsheet; kept so older backups still import.
 export const APP_ID = 'costsheet'
 export const SCHEMA_VERSION = 2
 
@@ -42,7 +43,7 @@ function fromBase64(data: string, type: string): Blob {
   return new Blob([bytes], { type })
 }
 
-export async function exportData(db: CostsheetDB): Promise<Backup> {
+export async function exportData(db: SwingtagDB): Promise<Backup> {
   const [settings, components, templates, styles, lineSheets, orders, photos] = await Promise.all([
     db.settings.get('settings'),
     db.components.toArray(),
@@ -81,12 +82,12 @@ export function parseBackup(text: string): Backup {
   try {
     data = JSON.parse(text)
   } catch {
-    throw new Error('That file is not a Costsheet backup (not valid JSON).')
+    throw new Error('That file is not a Swingtag backup (not valid JSON).')
   }
   const b = data as Partial<Backup>
-  if (!b || b.app !== APP_ID) throw new Error('That file is not a Costsheet backup.')
+  if (!b || b.app !== APP_ID) throw new Error('That file is not a Swingtag backup.')
   if (typeof b.schemaVersion !== 'number' || b.schemaVersion > SCHEMA_VERSION)
-    throw new Error('This backup was made by a newer version of Costsheet. Reload the app to update, then try again.')
+    throw new Error('This backup was made by a newer version of Swingtag. Reload the app to update, then try again.')
   return migrate(b as Backup)
 }
 
@@ -117,7 +118,7 @@ export function summarize(b: Backup) {
 
 export type ImportMode = 'replace' | 'merge'
 
-export async function importData(db: CostsheetDB, b: Backup, mode: ImportMode) {
+export async function importData(db: SwingtagDB, b: Backup, mode: ImportMode) {
   const photos: Photo[] = b.photos.map((p) => ({
     id: p.id,
     ownerId: p.ownerId,
@@ -157,5 +158,5 @@ async function mergeInto<T extends { id: string; updatedAt: number }>(table: imp
 
 export function backupFilename(d = new Date()) {
   const pad = (n: number) => String(n).padStart(2, '0')
-  return `costsheet-backup-${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}.json`
+  return `swingtag-backup-${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}.json`
 }

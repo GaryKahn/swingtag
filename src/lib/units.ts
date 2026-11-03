@@ -1,4 +1,4 @@
-import type { CostsheetDB } from '../db/schema'
+import type { SwingtagDB } from '../db/schema'
 import type { Measurement, Unit } from '../db/types'
 
 export const YD_IN_M = 0.9144
@@ -21,7 +21,7 @@ const round = (n: number, dp: number) => Math.round(n * 10 ** dp) / 10 ** dp
  * Switch the component library and templates to metres or yards, converting
  * quantities and prices. Styles keep their own units (they're already costed).
  */
-export async function switchMeasurement(db: CostsheetDB, to: Measurement) {
+export async function switchMeasurement(db: SwingtagDB, to: Measurement) {
   const from: Unit = to === 'metric' ? 'yd' : 'm'
   const target: Unit = to === 'metric' ? 'm' : 'yd'
   const now = Date.now()

@@ -22,7 +22,7 @@ const { offlineReady } = useRegisterSW({ immediate: true })
 <template>
   <div class="min-h-dvh md:flex">
     <aside class="sticky top-0 hidden h-dvh w-56 shrink-0 flex-col border-r border-stone-200 bg-white px-3 py-6 md:flex">
-      <div class="mb-8 px-3 font-serif text-xl">Costsheet</div>
+      <div class="mb-8 px-3 font-serif text-xl">Swingtag</div>
       <nav class="flex flex-col gap-1">
         <RouterLink v-for="n in nav" :key="n.to" :to="n.to" class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-stone-600 hover:bg-stone-100" active-class="!bg-stone-100 !text-ink font-medium">
           <Icon :name="n.icon" />{{ n.label }}

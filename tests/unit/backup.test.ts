@@ -1,6 +1,6 @@
 import 'fake-indexeddb/auto'
 import { describe, expect, it } from 'vitest'
-import { CostsheetDB } from '../../src/db/schema'
+import { SwingtagDB } from '../../src/db/schema'
 import { seed } from '../../src/db/seed'
 import { exportData, importData, parseBackup, summarize } from '../../src/lib/backup'
 import type { Style } from '../../src/db/types'
@@ -12,7 +12,7 @@ const makeStyle = (id: string, updatedAt: number, name = 'Shirt'): Style => ({
 })
 
 async function freshDb(name: string) {
-  const db = new CostsheetDB(name)
+  const db = new SwingtagDB(name)
   await seed(db)
   return db
 }
@@ -31,7 +31,7 @@ describe('backup', () => {
     })
     const json = JSON.stringify(await exportData(a))
 
-    const b = new CostsheetDB('b')
+    const b = new SwingtagDB('b')
     const parsed = parseBackup(json)
     expect(summarize(parsed)).toMatchObject({ styles: 1, photos: 1, orders: 1 })
     await importData(b, parsed, 'replace')
@@ -59,8 +59,8 @@ describe('backup', () => {
   })
 
   it('rejects files that are not backups', () => {
-    expect(() => parseBackup('nope')).toThrow(/not a Costsheet backup/)
-    expect(() => parseBackup('{"app":"other"}')).toThrow(/not a Costsheet backup/)
+    expect(() => parseBackup('nope')).toThrow(/not a Swingtag backup/)
+    expect(() => parseBackup('{"app":"other"}')).toThrow(/not a Swingtag backup/)
     expect(() => parseBackup('{"app":"costsheet","schemaVersion":99}')).toThrow(/newer version/)
   })
 })

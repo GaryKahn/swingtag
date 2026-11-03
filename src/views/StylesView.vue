@@ -60,7 +60,7 @@ async function start(t?: Template) {
   <div v-if="showInstallHint" class="mb-4 flex items-center gap-3 rounded-xl bg-ink p-3 pl-4 text-white">
     <Icon name="phone" :size="22" class="shrink-0" />
     <div class="min-w-0 flex-1 text-sm">
-      <div class="font-medium">Install Costsheet on your phone</div>
+      <div class="font-medium">Install Swingtag on your phone</div>
       <div class="text-xs text-white/70">Opens like an app, works offline, keeps your data safer.</div>
     </div>
     <button v-if="installPrompt" class="shrink-0 rounded-lg bg-white px-3 py-1.5 text-sm font-medium text-ink" @click="promptInstall()">Install</button>

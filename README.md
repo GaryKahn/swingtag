@@ -1,6 +1,6 @@
-# Costsheet
+# Swingtag
 
-**Live:** https://garykahn.github.io/costsheet/
+**Live:** https://garykahn.github.io/swingtag/
 
 Garment costing and line sheets for independent designers. Mobile-first and installable, and works fully offline.
 There is no login: all data stays in the browser (IndexedDB), and a JSON backup file moves it between devices.
@@ -20,7 +20,7 @@ There are step-by-step guides with more screenshots in the app under **Help & gu
 
 ## Install it like an app
 
-Open https://garykahn.github.io/costsheet/ once while online, then:
+Open https://garykahn.github.io/swingtag/ once while online, then:
 
 | Device | How |
 | --- | --- |
